@@ -1,0 +1,93 @@
+###################################
+# 🔥 BASIC LOG FILES
+###################################
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+###################################
+# 🔥 DEPENDENCY FOLDERS
+###################################
+node_modules/
+client/node_modules/
+server/node_modules/
+
+###################################
+# 🔥 ENVIRONMENT + SECRET FILES
+###################################
+.env
+.env.local
+.env.production
+.env.development
+.env.test
+*.env
+
+###################################
+# 🔥 BUILD OUTPUTS (React / Vite / Next / Express)
+###################################
+build/
+dist/
+out/
+.temp/
+.cache/
+.next/
+.vercel/
+.vite/
+
+###################################
+# 🔥 PM2 / Process Runtime Files
+###################################
+pids
+*.pid
+*.seed
+*.pid.lock
+
+###################################
+# 🔥 COVERAGE + TEST
+###################################
+coverage/
+*.test.js
+*.spec.js
+jest.config.js
+
+###################################
+# 🔥 UPLOAD / GENERATED FOLDERS
+###################################
+uploads/
+public/uploads/
+storage/
+
+###################################
+# 🔥 OS & EDITOR ARTIFACTS
+###################################
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.lock
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+###################################
+# 🔥 GIT + CACHE
+###################################
+*.orig
+*.rej
+*.cache
+.eslintcache
+Stylelintcache
+
+###################################
+# 🔥 OPTIONAL BUT USEFUL
+###################################
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
