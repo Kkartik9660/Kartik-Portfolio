@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 
 dotenv.config();
 
-// Fix __dirname support in ES Modules
+// Fix __dirname in ES Module
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,59 +17,56 @@ const port = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// ==================== CONTACT API EMAIL SENDER ====================
+/* ===================== CONTACT API (EMAIL) ===================== */
 const gmailUser = process.env.GMAIL_USER;
 const gmailAppPassword = process.env.GMAIL_APP_PASSWORD;
 
 if (!gmailUser || !gmailAppPassword) {
-  console.warn("⚠️ Missing Gmail Credentials. EMAIL will not work!");
+  console.log("⚠️ Missing Gmail ENV — Contact form email will NOT work!");
 }
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
-  auth: {
-    user: gmailUser,
-    pass: gmailAppPassword,
-  },
+  auth: { user: gmailUser, pass: gmailAppPassword },
 });
 
 app.post("/api/contact", async (req, res) => {
   const { name, email, message } = req.body;
 
   if (!name || !email || !message)
-    return res.status(400).json({ message: "All fields required!" });
+    return res.status(400).json({ message: "All fields are required!" });
 
   try {
     await transporter.sendMail({
       from: `"Portfolio Contact" <${gmailUser}>`,
-      replyTo: email,
       to: gmailUser,
-      subject: `📩 New Contact From ${name}`,
+      replyTo: email,
+      subject: `New Message From ${name}`,
       html: `
-        <h2>New portfolio message received</h2>
+        <h3>📩 New Portfolio Contact</h3>
         <p><b>Name:</b> ${name}</p>
         <p><b>Email:</b> ${email}</p>
-        <p><b>Message:</b></p>
-        <p>${message}</p>
+        <p><b>Message:</b><br>${message}</p>
       `,
     });
 
-    res.json({ message: "Message Delivered Successfully 🎉" });
+    res.json({ message: "Message sent successfully 🎉" });
   } catch (error) {
-    console.error("Mail Failed ❌", error);
-    res.status(500).json({ message: "Email Error — Try again later!" });
+    console.error("❌ Email Error →", error);
+    res.status(500).json({ message: "Failed to send email — Try later!" });
   }
 });
 
-// ==================== FRONTEND HOSTING ====================
-app.use(express.static(path.join(__dirname, "dist"))); // Vite output folder 🟢
+/* ===================== PRODUCTION REACT HOSTING ===================== */
+app.use(express.static(path.join(__dirname, "dist"))); // Vite Build
 
-// Express v5 fix → must use "/*"
-app.get(/^(?!\/api).*/, (req, res) => {
+// SPA Routing Fix — API routes exclude
+app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "dist/index.html"));
 });
 
-// ==================== START SERVER ====================
-app.listen(port, () =>
-  console.log(`🚀 Server + Frontend Live on http://localhost:${port}`)
-);
+/* ===================== SERVER START ===================== */
+app.listen(port, () => {
+  console.log(`🚀 Server running & UI serving on port ${port}`);
+  console.log(`🔗 LOCAL: http://localhost:${port}`);
+});
