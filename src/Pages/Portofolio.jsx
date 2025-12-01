@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from "react";
 import { db, collection } from "../firebase";
 import { getDocs } from "firebase/firestore";
 import PropTypes from "prop-types";
-import SwipeableViews from "react-swipeable-views";
+// import SwipeableViews from "react-swipeable-views";
 import { useTheme } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Tabs from "@mui/material/Tabs";
@@ -253,11 +253,11 @@ const fetchData = useCallback(async () => {
 
         </AppBar>
 
-<SwipeableViews
+{/* <SwipeableViews
   axis={theme.direction === "rtl" ? "x-reverse" : "x"}
   index={value}
   onChangeIndex={setValue}
->
+> */}
 
   {/* =================== PROJECTS =================== */}
   <TabPanel value={value} index={0} dir={theme.direction}>
@@ -408,7 +408,7 @@ const fetchData = useCallback(async () => {
 
 
 
-</SwipeableViews>
+{/* </SwipeableViews> */}
 
       </Box>
     </div>
