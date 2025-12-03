@@ -17,7 +17,7 @@ const port = process.env.PORT || 5000;
 app.use(
   cors({
     origin: [
-      "https://kartik-portfolio-awz9.onrender.com/", // frontend live domain
+      "https://kartik-portfolio-aw20.onrender.com", // frontend live domain
       "http://localhost:5173", // local dev
     ],
     methods: ["GET", "POST"],
