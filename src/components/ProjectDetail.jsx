@@ -4,9 +4,9 @@ import {
   ArrowLeft, ExternalLink, Github, Code2, Star,
   ChevronRight, Layers, Layout, Globe, Package, Cpu, Code,
 } from "lucide-react";
-import Swal from 'sweetalert2';
-import { db } from "../firebase"; 
-import { doc, getDoc } from "firebase/firestore"; 
+import Swal from "sweetalert2";
+import { db } from "../firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 const TECH_ICONS = {
   React: Globe,
@@ -21,7 +21,7 @@ const TECH_ICONS = {
 
 const TechBadge = ({ tech }) => {
   const Icon = TECH_ICONS[tech] || TECH_ICONS["default"];
-  
+
   return (
     <div className="group relative overflow-hidden px-3 py-2 md:px-4 md:py-2.5 bg-gradient-to-r from-blue-600/10 to-purple-600/10 rounded-xl border border-blue-500/10 hover:border-blue-500/30 transition-all duration-300 cursor-default">
       <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/10 group-hover:to-purple-500/10 transition-all duration-500" />
@@ -62,7 +62,9 @@ const ProjectStats = ({ project }) => {
           <Code2 className="text-blue-300 w-4 h-4 md:w-6 md:h-6" strokeWidth={1.5} />
         </div>
         <div className="flex-grow">
-          <div className="text-lg md:text-xl font-semibold text-blue-200">{techStackCount}</div>
+          <div className="text-lg md:text-xl font-semibold text-blue-200">
+            {techStackCount}
+          </div>
           <div className="text-[10px] md:text-xs text-gray-400">Total Teknologi</div>
         </div>
       </div>
@@ -72,7 +74,9 @@ const ProjectStats = ({ project }) => {
           <Layers className="text-purple-300 w-4 h-4 md:w-6 md:h-6" strokeWidth={1.5} />
         </div>
         <div className="flex-grow">
-          <div className="text-lg md:text-xl font-semibold text-purple-200">{featuresCount}</div>
+          <div className="text-lg md:text-xl font-semibold text-purple-200">
+            {featuresCount}
+          </div>
           <div className="text-[10px] md:text-xs text-gray-400">Fitur Utama</div>
         </div>
       </div>
@@ -81,15 +85,15 @@ const ProjectStats = ({ project }) => {
 };
 
 const handleGithubClick = (githubLink) => {
-  if (githubLink === 'Private') {
+  if (githubLink === "Private") {
     Swal.fire({
-      icon: 'info',
-      title: 'Source Code Private',
-      text: 'Maaf, source code untuk proyek ini bersifat privat.',
-      confirmButtonText: 'Mengerti',
-      confirmButtonColor: '#3085d6',
-      background: '#030014',
-      color: '#ffffff'
+      icon: "info",
+      title: "Source Code Private",
+      text: "Maaf, source code untuk proyek ini bersifat privat.",
+      confirmButtonText: "Mengerti",
+      confirmButtonColor: "#3085d6",
+      background: "#030014",
+      color: "#ffffff",
     });
     return false;
   }
@@ -100,34 +104,53 @@ const ProjectDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [project, setProject] = useState(null);
-  const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isGalleryHover, setIsGalleryHover] = useState(false);
 
-useEffect(() => {
-  window.scrollTo(0,0);
+  useEffect(() => {
+    window.scrollTo(0, 0);
 
-  const fetchProject = async () => {
-    try {
-      const ref = doc(db, "projects", id);
-      const snap = await getDoc(ref);
+    const fetchProject = async () => {
+      try {
+        const ref = doc(db, "projects", id);
+        const snap = await getDoc(ref);
 
-      if (snap.exists()) {
-        setProject({
-          id,
-          ...snap.data(),
-          Features: snap.data().Features || [],
-          TechStack: snap.data().TechStack || [],
-          Github: snap.data().Github || "No Repo Available",
-        });
-      } else {
-        console.log("Project Not Found ❌");
+        if (snap.exists()) {
+          setProject({
+            id,
+            ...snap.data(),
+            Features: snap.data().Features || [],
+            TechStack: snap.data().TechStack || [],
+            Github: snap.data().Github || "No Repo Available",
+          });
+        } else {
+          console.log("Project Not Found ❌");
+        }
+      } catch (error) {
+        console.log("🔥 Detail Fetch Error:", error);
       }
-    } catch (error) {
-      console.log("🔥 Detail Fetch Error:", error);
-    }
-  };
+    };
 
-  fetchProject();
-}, [id]);
+    fetchProject();
+  }, [id]);
+
+  // 🔁 AUTO SLIDE EVERY 2 SECONDS
+// 🔁 AUTO SLIDE EVERY 2 SECONDS
+useEffect(() => {
+  if (!project?.Img || !Array.isArray(project.Img) || project.Img.length <= 1)
+    return;
+
+  if (isGalleryHover) return;
+
+  const interval = setInterval(() => {
+    setActiveSlide((prev) =>
+      prev === project.Img.length - 1 ? 0 : prev + 1
+    );
+  }, 2000); // 2 seconds per slide
+
+  return () => clearInterval(interval);
+}, [project?.Img, isGalleryHover]);
+
 
   if (!project) {
     return (
@@ -140,9 +163,11 @@ useEffect(() => {
     );
   }
 
+  const hasMultipleImages = Array.isArray(project.Img) && project.Img.length > 1;
+
   return (
     <div className="min-h-screen bg-[#030014] px-[2%] sm:px-0 relative overflow-hidden">
-      {/* Background animations remain unchanged */}
+      {/* BG ANIMATIONS */}
       <div className="fixed inset-0">
         <div className="absolute -inset-[10px] opacity-20">
           <div className="absolute top-0 -left-4 w-72 md:w-96 h-72 md:h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob" />
@@ -154,6 +179,7 @@ useEffect(() => {
 
       <div className="relative">
         <div className="max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-16">
+          {/* Top breadcrumb + back */}
           <div className="flex items-center space-x-2 md:space-x-4 mb-8 md:mb-12 animate-fadeIn">
             <button
               onClick={() => navigate(-1)}
@@ -170,6 +196,7 @@ useEffect(() => {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8 md:gap-16">
+            {/* LEFT SIDE */}
             <div className="space-y-6 md:space-y-10 animate-slideInLeft">
               <div className="space-y-4 md:space-y-6">
                 <h1 className="text-3xl md:text-6xl font-bold bg-gradient-to-r from-blue-200 via-purple-200 to-pink-200 bg-clip-text text-transparent leading-tight">
@@ -190,7 +217,6 @@ useEffect(() => {
               <ProjectStats project={project} />
 
               <div className="flex flex-wrap gap-3 md:gap-4">
-                {/* Action buttons */}
                 <a
                   href={project.Link}
                   target="_blank"
@@ -207,7 +233,9 @@ useEffect(() => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group relative inline-flex items-center space-x-1.5 md:space-x-2 px-4 md:px-8 py-2.5 md:py-4 bg-gradient-to-r from-purple-600/10 to-pink-600/10 hover:from-purple-600/20 hover:to-pink-600/20 text-purple-300 rounded-xl transition-all duration-300 border border-purple-500/20 hover:border-purple-500/40 backdrop-blur-xl overflow-hidden text-sm md:text-base"
-                  onClick={(e) => !handleGithubClick(project.Github) && e.preventDefault()}
+                  onClick={(e) =>
+                    !handleGithubClick(project.Github) && e.preventDefault()
+                  }
                 >
                   <div className="absolute inset-0 translate-y-[100%] bg-gradient-to-r from-purple-600/10 to-pink-600/10 transition-transform duration-300 group-hover:translate-y-[0%]" />
                   <Github className="relative w-4 h-4 md:w-5 md:h-5 group-hover:rotate-12 transition-transform" />
@@ -227,71 +255,64 @@ useEffect(() => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm md:text-base text-gray-400 opacity-50">No technologies added.</p>
+                  <p className="text-sm md:text-base text-gray-400 opacity-50">
+                    No technologies added.
+                  </p>
                 )}
               </div>
             </div>
 
+            {/* RIGHT SIDE: IMAGE SLIDER + FEATURES */}
             <div className="space-y-6 md:space-y-10 animate-slideInRight">
-
-{/* ===== IMAGE GALLERY — BOOK PAGE TURN SLIDER ===== */}
-<div className="space-y-6 md:space-y-10 animate-slideInRight">
-
-  {Array.isArray(project.Img) && project.Img.length > 1 ? (
-
-    <div className="relative w-full overflow-hidden">
-      
-      {/* SLIDER WRAPPER */}
-      <div 
-        className="flex gap-6 overflow-x-auto pb-5 scrollbar-hide 
-        snap-x snap-mandatory scroll-smooth"
+             {/* ====== AUTO SCROLL IMAGE SLIDER (FINAL WORKING VERSION) ====== */}
+<div
+  className="relative w-full overflow-hidden"
+  onMouseEnter={() => setIsGalleryHover(true)}
+  onMouseLeave={() => setIsGalleryHover(false)}
+>
+  {hasMultipleImages ? (
+    <>
+      {/* SLIDER TRACK */}
+      <div
+        className="flex transition-transform duration-700 ease-out"
+        style={{ transform: `translateX(-${activeSlide * 100}%)` }}
       >
         {project.Img.map((url, index) => (
           <div
             key={index}
-            className="
-              snap-center flex-shrink-0 select-none
-              w-[350px] md:w-[520px]
-              h-[260px] md:h-[340px]
-              bg-black/50 rounded-2xl overflow-hidden 
-              border border-white/20 shadow-xl relative group
-              transition-all duration-500 ease-out
-            "
+            className="w-full flex-shrink-0 
+            h-[260px] md:h-[340px]
+            bg-black/50 rounded-2xl overflow-hidden 
+            border border-white/20 shadow-xl relative group"
           >
-            
-            {/* Dim other images like page shadow */}
-            <div className="
-              absolute inset-0 bg-black/30 opacity-70 
-              group-hover:opacity-0 transition-all duration-500
-            "></div>
-
-            {/* Main image */}
-            <img 
+            <img
               src={url}
-              className="
-                w-full h-full object-contain p-3
-                transition duration-500 
-                group-hover:scale-[1.07]
-              "
+              alt={`Slide ${index}`}
+              className="w-full h-full object-contain p-3 
+              transition duration-500 group-hover:scale-[1.05]"
             />
           </div>
         ))}
       </div>
 
-      {/* PAGE INDICATOR DOTS */}
+      {/* DOTS */}
       <div className="flex justify-center mt-4 gap-2">
-        {project.Img.map((_, i) => (
-          <div key={i} className="
-            w-3 h-3 rounded-full bg-white/30 
-            hover:bg-[#0FFFF3] transition-all
-          "></div>
+        {project.Img.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setActiveSlide(index)}
+            className={`w-3 h-3 rounded-full transition-all ${
+              activeSlide === index
+                ? "bg-[#0FFFF3]"
+                : "bg-white/30 hover:bg-white/60"
+            }`}
+          />
         ))}
       </div>
-    </div>
-
+    </>
   ) : (
-    <img 
-      src={project.Img}
+    <img
+      src={Array.isArray(project.Img) ? project.Img[0] : project.Img}
       className="w-full h-[320px] md:h-[400px] object-contain p-3
         bg-black rounded-xl border border-white/20 shadow-xl"
     />
@@ -299,8 +320,7 @@ useEffect(() => {
 </div>
 
 
-
-              {/* Fitur Utama */}
+              {/* KEY FEATURES */}
               <div className="bg-white/[0.02] backdrop-blur-xl rounded-2xl p-8 border border-white/10 space-y-6 hover:border-white/20 transition-colors duration-300 group">
                 <h3 className="text-xl font-semibold text-white/90 flex items-center gap-3">
                   <Star className="w-5 h-5 text-yellow-400 group-hover:rotate-[20deg] transition-transform duration-300" />
@@ -321,6 +341,7 @@ useEffect(() => {
         </div>
       </div>
 
+      {/* CSS ANIMATIONS */}
       <style jsx>{`
         @keyframes blob {
           0% {
