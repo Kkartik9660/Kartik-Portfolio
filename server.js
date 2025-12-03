@@ -17,7 +17,7 @@ const port = process.env.PORT || 5000;
 app.use(
   cors({
     origin: [
-      "https://your-frontend-domain.com", // <-- your portfolio URL
+      "https://kartik-portfolio-gkd2.onrender.com/api/contact", // <-- your portfolio URL
       "http://localhost:5173", // local dev
     ],
     methods: ["POST"],
